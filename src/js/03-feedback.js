@@ -14,11 +14,12 @@ refs.form.addEventListener("input", throttle(onTextareaInput, 500));
 
 refs.form.addEventListener("submit", (e) => {
   e.preventDefault();
-  console.log(formData);
-  e.currentTarget.reset();
+
   const objData = JSON.parse(localStorage.getItem(STORAGE_KEY));
   localStorage.removeItem(STORAGE_KEY);
-  
+  console.log(objData);
+  e.currentTarget.reset();
+
 });
 
 function onTextareaInput(e) {

@@ -20,15 +20,6 @@ function resumePlayback() {
   if (paused) {
     player
       .setCurrentTime(paused)
-      .then(function (seconds) {})
-      .catch(function (error) {
-        switch (error.name) {
-          case "Error":
-            break;
-          default:
-            break;
-        }
-      });
   }
 }
 resumePlayback();
