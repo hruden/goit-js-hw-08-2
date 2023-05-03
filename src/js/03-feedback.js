@@ -1,39 +1,48 @@
 import throttle from 'lodash.throttle';
 
-const STORAGE_KEY = "feedback-form-state";
 const refs = {
-  form: document.querySelector(".feedback-form"),
-  textarea: document.querySelector(".feedback-form textarea"),
-  input: document.querySelector("input"),
+  form: document.querySelector(`.feedback-form`),
+  email: document.querySelector(`[name="email"]`),
+  feedback: document.querySelector(`[name="message"]`),
 };
-const formData = {};
+const storageKey = 'feedback-form-state';
 
-populateTextarea();
+refs.form.addEventListener('submit', onFormSubmit);
+refs.form.addEventListener('input', throttle(onFormInput, 500));
 
-refs.form.addEventListener("input", throttle(onTextareaInput, 500));
+fillFormFids();
 
-refs.form.addEventListener("submit", (e) => {
+function onFormSubmit(e) {
   e.preventDefault();
-
-  const objData = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  localStorage.removeItem(STORAGE_KEY);
-  console.log(objData);
-  e.currentTarget.reset();
-
-});
-
-function onTextareaInput(e) {
-  formData[e.target.name] = e.target.value;
-  const stringifiedData = JSON.stringify(formData);
-  localStorage.setItem(STORAGE_KEY, stringifiedData);
-}
-
-function populateTextarea() {
-  const savedMessage = JSON.parse(localStorage.getItem(STORAGE_KEY));
-
-  if (savedMessage === null) {
+  const {
+    elements: { email, message },
+  } = e.currentTarget;
+  if (email.value === '' || message.value === '') {
+    window.alert('Усі поля повинні бути заповненні');
     return;
   }
-  refs.textarea.value = savedMessage["message"] || "";
-  refs.input.value = savedMessage["email"] || "";
+  const data = { email: email.value, message: message.value };
+  console.log(data);
+  e.currentTarget.reset();
+  localStorage.removeItem(storageKey);
+}
+
+function onFormInput(e) {
+  let feedbackFormData = localStorage.getItem(storageKey);
+  if (feedbackFormData) {
+    feedbackFormData = JSON.parse(feedbackFormData);
+  } else {
+    feedbackFormData = {};  
+  }
+  feedbackFormData[e.target.name] = e.target.value;
+  localStorage.setItem(storageKey, JSON.stringify(feedbackFormData));
+}
+
+function fillFormFids() {
+  const saveFormData = localStorage.getItem(storageKey);
+  if (saveFormData) {
+    const parsedFormData = JSON.parse(saveFormData);
+    refs.email.value = parsedFormData.email ? parsedFormData.email : '';
+    refs.feedback.value = parsedFormData.message ? parsedFormData.message : '';
+  }
 }
